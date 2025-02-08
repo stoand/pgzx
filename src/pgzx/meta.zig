@@ -1,6 +1,6 @@
 pub inline fn isSlice(comptime T: type) bool {
     return switch (@typeInfo(T)) {
-        .pointer => |p| p.size == .Slice,
+        .pointer => |p| p.size == .slice,
         else => false,
     };
 }
@@ -8,7 +8,7 @@ pub inline fn isSlice(comptime T: type) bool {
 pub inline fn sliceElemType(comptime T: type) type {
     return switch (@typeInfo(T)) {
         .pointer => |p| {
-            if (p.size != .Slice) {
+            if (p.size != .slice) {
                 @compileError("Expected a slice type");
             }
             return p.child;
@@ -26,21 +26,21 @@ pub inline fn pointerElemType(comptime T: type) type {
 
 pub inline fn hasSentinal(comptime T: type) bool {
     return switch (@typeInfo(T)) {
-        .pointer => |p| p.size == .Slice and p.sentinel != null,
+        .pointer => |p| p.size == .slice and p.sentinel() != null,
         else => false,
     };
 }
 
 pub inline fn isStringLike(comptime T: type) bool {
     return switch (@typeInfo(T)) {
-        .pointer => |p| p.size == .Slice and p.child == u8,
+        .pointer => |p| p.size == .slice and p.child == u8,
         else => false,
     };
 }
 
 pub inline fn isStringLikeZ(comptime T: type) bool {
     return switch (@typeInfo(T)) {
-        .pointer => |p| p.size == .Slice and p.child == u8 and p.sentinel != null,
+        .pointer => |p| p.size == .slice and p.child == u8 and p.sentinel != null,
         else => false,
     };
 }
