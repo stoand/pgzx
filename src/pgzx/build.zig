@@ -107,7 +107,7 @@ pub const Project = struct {
             .root_dir = proj.config.root_dir,
             .root_source_file = proj.build.path(proj.config.root_source_file.?),
         });
-        var mod = &lib.root_module;
+        var mod = lib.root_module;
         mod.addImport("pgzx", proj.deps.pgzx);
 
         var it = proj.options.iterator();

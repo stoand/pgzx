@@ -80,12 +80,11 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         });
         module.addImport("pgzx_pgsys", pgzx_pgsys);
-        module.addImport("gen_node_tags", .{
-            .source_file = node_tags_src,
-            .dependencies = &.{
-                .{ .name = "pgzx_pgsys", .module = pgzx_pgsys },
-            },
-        });
+        module.addImport("gen_node_tags", b.createModule(.{
+            .root_source_file = node_tags_src,
+            .target = target,
+            .optimize = optimize,
+        }));
 
         break :blk module;
     };
@@ -107,14 +106,13 @@ pub fn build(b: *std.Build) void {
 
         tests.lib.root_module.addIncludePath(b.path("./src/pgzx/c/include/"));
 
-        tests.lib.root_module.addModule("pgzx_pgsys", pgzx_pgsys);
-        tests.lib.root_module.addModule("pgzx", pgzx);
-        tests.lib.root_module.addModule("gen_node_tags", .{
-            .source_file = node_tags_src,
-            .dependencies = &.{
-                .{ .name = "pgzx_pgsys", .module = pgzx_pgsys },
-            },
-        });
+        tests.lib.root_module.addImport("pgzx_pgsys", pgzx_pgsys);
+        tests.lib.root_module.addImport("pgzx", pgzx);
+        tests.lib.root_module.addImport("gen_node_tags", b.createModule(.{
+            .root_source_file = node_tags_src,
+            .target = target,
+            .optimize = optimize,
+        }));
 
         break :blk tests;
     };
