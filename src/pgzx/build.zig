@@ -625,11 +625,11 @@ pub fn runPGConfig(b: *Build, question: []const u8) []const u8 {
     var child = std.process.Child.init(&argv, allocator);
     child.stdout_behavior = .Pipe;
     child.stderr_behavior = .Pipe;
-    var stdout = std.ArrayList(u8).init(allocator);
-    var stderr = std.ArrayList(u8).init(allocator);
+    var stdout = std.ArrayListAlignedUnmanaged(u8, 1).initCapacity(allocator, 1024) catch @panic("Failed to allocate stdout");
+    var stderr = std.ArrayListAlignedUnmanaged(u8, 1).initCapacity(allocator, 1024) catch @panic("Failed to allocate stderr");
 
     child.spawn() catch @panic("failed to start pg_config");
-    child.collectOutput(&stdout, &stderr, 1024) catch @panic("error while reading from pg_config");
+    child.collectOutput(allocator, &stdout, &stderr, 1024) catch @panic("error while reading from pg_config");
     const term = child.wait() catch @panic("awaiting pg_config exit");
     if (!check_exec(term)) {
         @panic("pg_config failed");

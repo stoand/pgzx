@@ -61,7 +61,7 @@ pub fn build(b: *std.Build) void {
         const tool = b.addExecutable(.{
             .name = "gennodetags",
             .root_source_file = b.path("./tools/gennodetags/main.zig"),
-            .target = b.host,
+            .target = target,
             .link_libc = true,
         });
         tool.root_module.addIncludePath(.{ .cwd_relative = pgbuild.getIncludeServerDir() });
@@ -80,9 +80,9 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         });
         module.addImport("pgzx_pgsys", pgzx_pgsys);
-        module.addAnonymousImport("gen_node_tags", .{
-            .root_source_file = node_tags_src,
-            .imports = &.{
+        module.addImport("gen_node_tags", .{
+            .source_file = node_tags_src,
+            .dependencies = &.{
                 .{ .name = "pgzx_pgsys", .module = pgzx_pgsys },
             },
         });
@@ -107,11 +107,11 @@ pub fn build(b: *std.Build) void {
 
         tests.lib.root_module.addIncludePath(b.path("./src/pgzx/c/include/"));
 
-        tests.lib.root_module.addImport("pgzx_pgsys", pgzx_pgsys);
-        tests.lib.root_module.addImport("pgzx", pgzx);
-        tests.lib.root_module.addAnonymousImport("gen_node_tags", .{
-            .root_source_file = node_tags_src,
-            .imports = &.{
+        tests.lib.root_module.addModule("pgzx_pgsys", pgzx_pgsys);
+        tests.lib.root_module.addModule("pgzx", pgzx);
+        tests.lib.root_module.addModule("gen_node_tags", .{
+            .source_file = node_tags_src,
+            .dependencies = &.{
                 .{ .name = "pgzx_pgsys", .module = pgzx_pgsys },
             },
         });
